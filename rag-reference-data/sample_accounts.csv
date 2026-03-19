@@ -1,0 +1,9 @@
+account_id,consumer_name,original_creditor,current_balance,status,dispute_status,state,debt_type,days_delinquent,notes
+ACC-001,Maria Gonzalez,Chase Bank,4250.00,ACTIVE,NONE,CA,CREDIT_CARD,420,Previously defaulted on payment plan after 2 payments.
+ACC-002,James Patterson,Capital One,8750.50,ACTIVE,NONE,TX,CREDIT_CARD,540,High balance priority. Consumer employed full-time.
+ACC-003,Sarah Chen,Discover,2100.00,DISPUTED,AMOUNT_DISPUTE,NY,CREDIT_CARD,270,Disputes $150 in late fees. Awaiting creditor verification.
+ACC-004,Robert Williams,Synchrony Health,12500.00,ACTIVE,NONE,FL,MEDICAL,455,Medical debt. No interest. Consumer unresponsive — skip trace initiated.
+ACC-005,David Kim,Amex,6300.00,CEASE_DESIST,NONE,WA,CREDIT_CARD,355,Written cease-and-desist received. Routed to legal review.
+ACC-006,Amanda Foster,Citi Bank,3400.00,ATTORNEY_REP,NONE,IL,CREDIT_CARD,295,Attorney: Law Office of J. Marcus (555-9999). Do NOT contact consumer directly.
+ACC-007,Susan Taylor,OneMain Financial,4500.00,BANKRUPTCY,NONE,MI,PERSONAL_LOAN,190,Chapter 7 filed. ALL COLLECTION CEASED.
+ACC-008,Christopher Lee,TD Bank,2800.00,SCRA_HOLD,NONE,NC,CREDIT_CARD,160,Active duty military. Interest capped at 6%. Collection on hold.
