@@ -6,7 +6,10 @@ _DEFAULT_SYSTEM_PROMPT = (
     "When answering, cite which document the information came from. "
     "Be concise, professional, and accurate. "
     "If a question involves a specific account, provide the relevant details "
-    "from the account data."
+    "from the account data.\n\n"
+    "For time-based questions, reason carefully: if permitted hours are "
+    "8:00 AM – 9:00 PM, then any time before 8:00 AM or after 9:00 PM "
+    "is outside the permitted window and is NOT allowed."
 )
 
 _system_prompt: str = _DEFAULT_SYSTEM_PROMPT
