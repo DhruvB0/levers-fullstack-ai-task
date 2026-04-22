@@ -28,7 +28,9 @@ export default function StatusBadge() {
   return (
     <div
       className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${
-        online ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+        online
+          ? 'bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-400'
+          : 'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-400'
       }`}
     >
       <span

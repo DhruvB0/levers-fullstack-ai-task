@@ -25,10 +25,10 @@ export default function ChatInput({ onSend, isLoading }: Props) {
   };
 
   return (
-    <div className="border-t border-gray-200 bg-white p-4">
-      <div className="flex items-end gap-2 rounded-xl border border-gray-300 bg-gray-50 px-3 py-2 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500">
+    <div className="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 p-4">
+      <div className="flex items-end gap-2 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 px-3 py-2 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500">
         <textarea
-          className="flex-1 resize-none bg-transparent text-sm text-gray-900 placeholder-gray-400 outline-none"
+          className="flex-1 resize-none bg-transparent text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 outline-none"
           placeholder="Ask about FDCPA rules, accounts, scripts…"
           rows={1}
           value={value}
@@ -44,11 +44,12 @@ export default function ChatInput({ onSend, isLoading }: Props) {
           aria-label="Send message"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+              d="M5 12h14M12 5l7 7-7 7" />
           </svg>
         </button>
       </div>
-      <p className="mt-1.5 text-center text-xs text-gray-400">
+      <p className="mt-1.5 text-center text-xs text-gray-400 dark:text-gray-500">
         Enter to send · Shift+Enter for new line
       </p>
     </div>

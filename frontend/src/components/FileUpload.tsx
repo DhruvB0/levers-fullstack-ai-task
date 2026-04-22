@@ -37,16 +37,19 @@ export default function FileUpload() {
   };
 
   return (
-    <div className="border-t border-gray-200 bg-white px-4 py-3">
+    <div className="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 px-4 py-3">
       <div
-        onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setIsDragging(true);
+        }}
         onDragLeave={() => setIsDragging(false)}
         onDrop={onDrop}
         onClick={() => inputRef.current?.click()}
         className={`cursor-pointer rounded-lg border-2 border-dashed px-4 py-3 text-center text-xs transition-colors ${
           isDragging
-            ? 'border-blue-400 bg-blue-50'
-            : 'border-gray-200 text-gray-400 hover:border-gray-300 hover:bg-gray-50'
+            ? 'border-blue-400 bg-blue-50 dark:bg-blue-950'
+            : 'border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-900'
         }`}
       >
         <input
@@ -61,7 +64,7 @@ export default function FileUpload() {
           }}
         />
         {state === 'uploading' ? (
-          <span className="text-blue-600">Uploading…</span>
+          <span className="text-blue-600 dark:text-blue-400">Uploading…</span>
         ) : (
           <span>Drop a .md or .csv file to ingest, or click to browse</span>
         )}
@@ -69,7 +72,9 @@ export default function FileUpload() {
       {message && (
         <p
           className={`mt-1.5 text-xs ${
-            state === 'error' ? 'text-red-600' : 'text-green-600'
+            state === 'error'
+              ? 'text-red-600 dark:text-red-400'
+              : 'text-green-600 dark:text-green-400'
           }`}
         >
           {message}

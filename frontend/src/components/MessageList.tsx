@@ -19,10 +19,12 @@ export default function MessageList({ messages, isLoading }: Props) {
 
   if (messages.length === 0) {
     return (
-      <div className="flex flex-1 items-center justify-center text-gray-400">
+      <div className="flex flex-1 items-center justify-center text-gray-400 dark:text-gray-500">
         <div className="text-center">
           <p className="text-lg font-medium">Debt Collection Assistant</p>
-          <p className="mt-1 text-sm">Ask about FDCPA rules, call scripts, or account statuses.</p>
+          <p className="mt-1 text-sm">
+            Ask about FDCPA rules, call scripts, or account statuses.
+          </p>
         </div>
       </div>
     );
@@ -35,11 +37,11 @@ export default function MessageList({ messages, isLoading }: Props) {
       ))}
       {isLoading && messages[messages.length - 1]?.role === 'user' && (
         <div className="flex justify-start mb-4">
-          <div className="rounded-2xl rounded-bl-sm bg-gray-100 px-4 py-3">
+          <div className="rounded-2xl rounded-bl-sm bg-gray-100 dark:bg-gray-800 px-4 py-3">
             <div className="flex gap-1">
-              <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:0ms]" />
-              <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:150ms]" />
-              <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:300ms]" />
+              <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400 dark:bg-gray-500 [animation-delay:0ms]" />
+              <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400 dark:bg-gray-500 [animation-delay:150ms]" />
+              <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400 dark:bg-gray-500 [animation-delay:300ms]" />
             </div>
           </div>
         </div>

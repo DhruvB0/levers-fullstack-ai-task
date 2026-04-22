@@ -15,7 +15,7 @@ export default function MessageBubble({ message }: Props) {
         className={`max-w-[75%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
           isUser
             ? 'bg-blue-600 text-white rounded-br-sm'
-            : 'bg-gray-100 text-gray-900 rounded-bl-sm'
+            : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-bl-sm'
         }`}
       >
         <p className="whitespace-pre-wrap">
@@ -30,7 +30,7 @@ export default function MessageBubble({ message }: Props) {
             {message.sources.map((source) => (
               <span
                 key={source}
-                className="rounded-full bg-gray-200 px-2 py-0.5 text-xs text-gray-600"
+                className="rounded-full bg-gray-200 dark:bg-gray-700 px-2 py-0.5 text-xs text-gray-600 dark:text-gray-300"
               >
                 {source}
               </span>
