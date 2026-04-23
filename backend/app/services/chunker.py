@@ -1,8 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-from app.core.constants import SECTION_CHUNKED_FILENAMES
-
 
 @dataclass
 class Chunk:
@@ -81,20 +79,25 @@ def chunk_by_csv_rows(text: str, source: str) -> list[Chunk]:
     return [Chunk(text=row, source=source, chunk_index=i) for i, row in enumerate(rows)]
 
 
+def _has_sections(text: str) -> bool:
+    """Return True if markdown has ## headers worth splitting on."""
+    return sum(1 for line in text.splitlines() if line.startswith("## ")) >= 2
+
+
 def chunk_document(text: str, file_path: Path) -> list[Chunk]:
     """
     Route to the correct chunking strategy based on file type.
 
-    glossary.md  → section-based  (tables must not be split mid-row)
     *.csv        → one chunk per row (avoids mixing unrelated accounts in context)
+    markdown with 2+ '## ' headers → section-based (keeps sections/tables intact)
     everything else → fixed-size
     """
     source = file_path.name
 
-    if file_path.name in SECTION_CHUNKED_FILENAMES:
-        return chunk_by_section(text, source)
-
     if file_path.suffix == ".csv":
         return chunk_by_csv_rows(text, source)
+
+    if file_path.suffix == ".md" and _has_sections(text):
+        return chunk_by_section(text, source)
 
     return chunk_by_fixed_size(text, source)

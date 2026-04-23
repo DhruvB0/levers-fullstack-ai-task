@@ -11,10 +11,79 @@ _index: BM25Okapi | None = None
 _corpus: list[dict] = []
 
 
+# Words that carry zero retrieval signal in a debt collection context.
+# Intentionally minimal — when in doubt, keep the word.
+# Do NOT add: not, no, may, must, should, will, cannot, never
+# Those carry legal meaning and affect BM25 scoring correctly.
+_STOP_WORDS = frozenset(
+    {
+        # articles
+        "a",
+        "an",
+        "the",
+        # basic prepositions
+        "in",
+        "on",
+        "at",
+        "to",
+        "for",
+        "of",
+        "with",
+        "by",
+        "from",
+        # pronouns
+        "i",
+        "me",
+        "my",
+        "we",
+        "our",
+        "you",
+        "your",
+        "it",
+        "its",
+        # question words
+        "what",
+        "which",
+        "who",
+        "whom",
+        "how",
+        # basic verbs
+        "is",
+        "are",
+        "was",
+        "were",
+        "be",
+        "been",
+        "being",
+        "do",
+        "does",
+        "did",
+        "have",
+        "has",
+        "had",
+        # connectors
+        "and",
+        "or",
+        "but",
+        "so",
+        "as",
+        "than",
+        "that",
+        "this",
+        # fillers
+        "there",
+        "here",
+        "just",
+        "also",
+        "about",
+    }
+)
+
+
 def _tokenize(text: str) -> list[str]:
-    # Strip punctuation before splitting so "ACC-007?" and "ACC-007" both
-    # become ["acc", "007"] and match each other in BM25 scoring.
-    return re.findall(r'\w+', text.lower())
+    # Strip punctuation so "ACC-007?" → ["acc", "007"].
+    # Filter stop words so common query terms don't drown out specific IDs.
+    return [t for t in re.findall(r'\w+', text.lower()) if t not in _STOP_WORDS]
 
 
 def build_index(corpus: list[dict]) -> None:

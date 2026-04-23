@@ -61,6 +61,12 @@ def test_non_glossary_uses_fixed_chunking():
     assert len(chunks) > 1
 
 
+def test_markdown_without_headers_uses_fixed_chunking():
+    text = " ".join(["word"] * 600)
+    chunks = chunk_document(text, Path("some.md"))
+    assert len(chunks) > 1
+
+
 def test_empty_sections_are_filtered():
     text = "## Section One\n\n## Section Two\nactual content"
     chunks = chunk_by_section(text, "glossary.md")
