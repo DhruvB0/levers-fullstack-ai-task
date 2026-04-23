@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { deleteDocument, listDocuments } from '@/lib/api';
 import type { DocumentInfo } from '@/types';
@@ -13,24 +13,20 @@ export default function DocumentList({ refreshTrigger }: Props) {
   const [docs, setDocs] = useState<DocumentInfo[]>([]);
   const [deleting, setDeleting] = useState<string | null>(null);
 
-  const fetchDocs = useCallback(async () => {
-    try {
-      const data = await listDocuments();
-      setDocs(data);
-    } catch {
-      // silently ignore — backend may not be ready yet
-    }
-  }, []);
-
   useEffect(() => {
-    fetchDocs();
-  }, [fetchDocs, refreshTrigger]);
+    let cancelled = false;
+    listDocuments()
+      .then((data) => { if (!cancelled) setDocs(data); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [refreshTrigger]);
 
   const handleDelete = async (filename: string) => {
     setDeleting(filename);
     try {
       await deleteDocument(filename);
-      await fetchDocs();
+      const data = await listDocuments();
+      setDocs(data);
     } catch {
       // deletion failed — list stays unchanged
     } finally {

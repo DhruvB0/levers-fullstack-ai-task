@@ -10,15 +10,14 @@ import type { Message, Model } from '@/types';
 export function useChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [model, setModel] = useState<Model>('gpt-4o-mini');
+  const [model, _setModel] = useState<Model>('gpt-4o-mini');
   const [streamingEnabled, setStreamingEnabled] = useState(true);
   const abortRef = useRef<AbortController | null>(null);
 
-  useEffect(() => {
-    if (THINKING_MODELS.has(model)) {
-      setStreamingEnabled(false);
-    }
-  }, [model]);
+  const setModel = useCallback((next: Model) => {
+    _setModel(next);
+    if (THINKING_MODELS.has(next)) setStreamingEnabled(false);
+  }, []);
 
   useEffect(() => {
     return () => { abortRef.current?.abort(); };

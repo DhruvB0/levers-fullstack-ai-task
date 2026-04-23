@@ -71,7 +71,7 @@ def test_bm25_hyphenated_id_matches_despite_punctuation_in_query():
     # ["acc", "007"] so BM25 finds the account by ID.
     corpus = [
         {"text": "Account ACC-007 belongs to Susan Taylor.", "source": "accounts.csv"},
-        {"text": "Account ACC-001 belongs to Maria Gonzalez.", "source": "accounts.csv"},
+        {"text": "Account ACC-001 belongs to Maria Gonzalez.", "source": "acc.csv"},
     ]
     build_index(corpus)
     results = query_bm25("What is the status of account ACC-007?", top_k=1)

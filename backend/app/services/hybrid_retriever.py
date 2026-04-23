@@ -17,7 +17,8 @@ def _reciprocal_rank_fusion(ranked_lists: list[list[dict]], k: int = 60) -> list
     docs: dict[str, dict] = {}
     for ranked in ranked_lists:
         for rank, item in enumerate(ranked, start=1):
-            # Full-text hash avoids false deduplication from the 80-char prefix approach.
+            # Full-text hash avoids false deduplication
+            # from the 80-char prefix approach.
             key = hashlib.sha1(
                 f"{item['source']}\x00{item['text']}".encode(), usedforsecurity=False
             ).hexdigest()
@@ -51,7 +52,10 @@ def get_relevant_context(query: str) -> tuple[str, list[str]]:
     for chunk in top_chunks:
         part = f"[Source: {chunk['source']}]\n{chunk['text']}"
         if total_chars + len(part) > settings.max_context_chars:
-            logger.warning("Context limit reached at %d chars; dropping remaining chunks.", total_chars)
+            logger.warning(
+                "Context limit reached at %d chars; dropping remaining chunks.",
+                total_chars,
+            )
             break
         context_parts.append(part)
         total_chars += len(part) + len(_SEP)

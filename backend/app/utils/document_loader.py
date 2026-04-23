@@ -7,7 +7,8 @@ def load_markdown(file_path: Path) -> str:
 
 
 def load_csv_as_prose(file_path: Path) -> str:
-    # Prose gives embeddings semantic shape — raw CSV column values have poor vector representation.
+    # Prose gives embeddings semantic shape —
+    # raw CSV column values have poor vector representation.
     paragraphs = []
     with open(file_path, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
