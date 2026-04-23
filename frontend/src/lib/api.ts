@@ -28,21 +28,30 @@ export async function streamChatMessage(
 
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
+  let buffer = '';
 
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
 
-    const text = decoder.decode(value, { stream: true });
-    const lines = text.split('\n').filter((line) => line.startsWith('data: '));
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop() ?? '';
 
     for (const line of lines) {
-      const data = line.replace('data: ', '');
-      if (data === '[DONE]') {
+      if (!line.startsWith('data: ')) continue;
+      const raw = line.slice('data: '.length).trim();
+      if (raw === '[DONE]') {
         onDone();
         return;
       }
-      if (data) onToken(data);
+      if (!raw) continue;
+      try {
+        const token = JSON.parse(raw) as string;
+        if (token) onToken(token);
+      } catch {
+        // malformed JSON chunk — skip
+      }
     }
   }
   onDone();

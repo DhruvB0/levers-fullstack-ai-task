@@ -26,6 +26,7 @@ export default function ControlBar({
         >
           <option value="gpt-4o-mini">gpt-4o-mini (fast)</option>
           <option value="o1-mini">o1-mini (thinking)</option>
+          <option value="o3-mini">o3-mini (thinking)</option>
         </select>
       </div>
 

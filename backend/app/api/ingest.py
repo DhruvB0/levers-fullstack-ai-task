@@ -4,9 +4,10 @@ from pathlib import Path
 from fastapi import APIRouter, File, HTTPException, UploadFile
 
 from app.models.ingest import IngestResponse
+from app.services import bm25_store
 from app.services.chunker import chunk_document
 from app.services.embedder import generate_embeddings
-from app.services.vector_store import store_chunks
+from app.services.vector_store import get_all_chunks, store_chunks
 from app.utils.document_loader import load_document
 
 router = APIRouter()
@@ -35,6 +36,7 @@ async def ingest_document(file: UploadFile = File(...)) -> IngestResponse:
     chunks = chunk_document(text, named_path)
     embeddings = generate_embeddings([chunk.text for chunk in chunks])
     store_chunks(chunks, embeddings)
+    bm25_store.build_index(get_all_chunks())
 
     return IngestResponse(
         filename=file.filename or "",

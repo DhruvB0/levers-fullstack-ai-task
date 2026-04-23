@@ -1,6 +1,6 @@
 export type Role = 'user' | 'assistant';
 
-export type Model = 'gpt-4o-mini' | 'o1-mini';
+export type Model = 'gpt-4o-mini' | 'o1-mini' | 'o3-mini';
 
 export interface Message {
   id: string;

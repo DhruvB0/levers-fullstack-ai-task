@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-ALLOWED_MODELS = {"gpt-4o-mini", "o1-mini"}
+ALLOWED_MODELS = {"gpt-4o-mini", "o1-mini", "o3-mini"}
 
 
 class ChatRequest(BaseModel):

@@ -1,8 +1,8 @@
 from collections.abc import Generator
 
 from app.core.prompt_store import get_system_prompt
+from app.services.hybrid_retriever import get_relevant_context
 from app.services.llm import get_completion, stream_completion
-from app.services.retriever import get_relevant_context
 from app.services.vector_store import get_document_count
 
 _EMPTY_STORE_MSG = (

@@ -8,7 +8,7 @@ settings = get_settings()
 client = OpenAI(api_key=settings.openai_api_key)
 
 # o1 models reject the 'system' role — prompt must be injected as first user message
-O1_MODELS = {"o1-mini", "o1-preview", "o1"}
+O1_MODELS = {"o1-mini", "o1-preview", "o1", "o3-mini"}
 
 
 def _build_messages(
@@ -35,11 +35,12 @@ def get_completion(
     model: str,
 ) -> str:
     messages = _build_messages(system_prompt, context, query, model)
-    response = client.chat.completions.create(
-        model=model,
-        messages=messages,
-        max_completion_tokens=1000,
-    )
+    kwargs: dict = {"model": model, "messages": messages}
+    # Reasoning models (o1/o3) consume tokens for internal chain-of-thought;
+    # capping at 1000 leaves nothing for the actual response — let them self-limit.
+    if model not in O1_MODELS:
+        kwargs["max_completion_tokens"] = 1000
+    response = client.chat.completions.create(**kwargs)
     return response.choices[0].message.content or ""
 
 
@@ -52,7 +53,7 @@ def stream_completion(
     """
     Yield response tokens for SSE streaming.
 
-    o1 models don't support streaming — fall back to a single chunk
+    o1/o3 models don't support streaming — fall back to a single chunk
     so the caller doesn't need to handle the distinction.
     """
     if model in O1_MODELS:

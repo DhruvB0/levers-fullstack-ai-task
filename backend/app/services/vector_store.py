@@ -59,3 +59,12 @@ def retrieve_similar_chunks(
 
 def get_document_count() -> int:
     return get_collection().count()
+
+
+def get_all_chunks() -> list[dict]:
+    collection = get_collection()
+    result = collection.get(include=["documents", "metadatas"])
+    return [
+        {"text": doc, "source": meta["source"]}
+        for doc, meta in zip(result["documents"], result["metadatas"])
+    ]

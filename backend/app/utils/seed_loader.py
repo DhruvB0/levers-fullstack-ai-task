@@ -2,9 +2,10 @@ import logging
 from pathlib import Path
 
 from app.core.config import get_settings
+from app.services import bm25_store
 from app.services.chunker import chunk_document
 from app.services.embedder import generate_embeddings
-from app.services.vector_store import get_document_count, store_chunks
+from app.services.vector_store import get_all_chunks, get_document_count, store_chunks
 from app.utils.document_loader import load_document
 
 logger = logging.getLogger(__name__)
@@ -19,7 +20,10 @@ def seed_reference_documents() -> None:
     re-embed all documents and waste API credits.
     """
     if get_document_count() > 0:
-        logger.info("Vector store already seeded. Skipping ingestion.")
+        logger.info(
+            "Vector store already seeded. Rebuilding BM25 index from existing corpus."
+        )
+        bm25_store.build_index(get_all_chunks())
         return
 
     seed_path = Path(settings.seed_data_path)
@@ -41,4 +45,5 @@ def seed_reference_documents() -> None:
     embeddings = generate_embeddings(texts)
 
     store_chunks(all_chunks, embeddings)
+    bm25_store.build_index(get_all_chunks())
     logger.info("Seeded %d chunks from %d files.", len(all_chunks), len(files))

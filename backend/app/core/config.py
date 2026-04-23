@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     chroma_collection_name: str = "debt_collection_docs"
     embedding_model: str = "text-embedding-3-small"
     seed_data_path: str = "/app/rag-reference-data"
-    top_k_results: int = 5
+    top_k_results: int = 10
 
     model_config = {"env_file": ".env"}
 

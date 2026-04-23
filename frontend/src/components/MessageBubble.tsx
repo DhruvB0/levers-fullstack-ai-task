@@ -1,6 +1,11 @@
 'use client';
 
+import { marked } from 'marked';
+import { useMemo } from 'react';
+
 import type { Message } from '@/types';
+
+marked.use({ breaks: true, gfm: true });
 
 interface Props {
   message: Message;
@@ -8,6 +13,12 @@ interface Props {
 
 export default function MessageBubble({ message }: Props) {
   const isUser = message.role === 'user';
+  const content = message.isStreaming ? message.content + '▍' : message.content;
+
+  const html = useMemo(
+    () => (isUser ? null : (marked.parse(content) as string)),
+    [isUser, content],
+  );
 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>
@@ -18,12 +29,14 @@ export default function MessageBubble({ message }: Props) {
             : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-bl-sm'
         }`}
       >
-        <p className="whitespace-pre-wrap">
-          {message.content}
-          {message.isStreaming && (
-            <span className="ml-0.5 inline-block h-3.5 w-0.5 animate-pulse bg-current opacity-75" />
-          )}
-        </p>
+        {isUser ? (
+          <p className="whitespace-pre-wrap">{content}</p>
+        ) : (
+          <div
+            className="md-content"
+            dangerouslySetInnerHTML={{ __html: html ?? '' }}
+          />
+        )}
 
         {message.sources && message.sources.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-1">

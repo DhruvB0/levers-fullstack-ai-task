@@ -66,16 +66,33 @@ def chunk_by_section(text: str, source: str) -> list[Chunk]:
     ]
 
 
+def chunk_by_csv_rows(text: str, source: str) -> list[Chunk]:
+    """
+    One chunk per CSV row (already converted to prose paragraphs by load_csv_as_prose).
+
+    load_csv_as_prose joins rows with '\n\n', so splitting on that separator
+    recovers one self-contained prose description per account row.
+    This prevents unrelated rows from being bundled into the same chunk and
+    pulled together into context when only one account is relevant.
+    """
+    rows = [r.strip() for r in text.split("\n\n") if r.strip()]
+    return [Chunk(text=row, source=source, chunk_index=i) for i, row in enumerate(rows)]
+
+
 def chunk_document(text: str, file_path: Path) -> list[Chunk]:
     """
-    Route to the correct chunking strategy based on filename.
+    Route to the correct chunking strategy based on file type.
 
     glossary.md  → section-based  (tables must not be split mid-row)
+    *.csv        → one chunk per row (avoids mixing unrelated accounts in context)
     everything else → fixed-size
     """
     source = file_path.name
 
     if file_path.name == "glossary.md":
         return chunk_by_section(text, source)
+
+    if file_path.suffix == ".csv":
+        return chunk_by_csv_rows(text, source)
 
     return chunk_by_fixed_size(text, source)

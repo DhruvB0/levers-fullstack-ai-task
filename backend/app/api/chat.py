@@ -1,3 +1,5 @@
+import json
+
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 
@@ -18,7 +20,7 @@ async def chat(request: ChatRequest) -> ChatResponse | StreamingResponse:
 
         def event_stream():
             for token in stream_answer_query(request.query, request.model):
-                yield f"data: {token}\n\n"
+                yield f"data: {json.dumps(token)}\n\n"
             yield "data: [DONE]\n\n"
 
         return StreamingResponse(

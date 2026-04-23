@@ -1,6 +1,11 @@
 from pathlib import Path
 
-from app.services.chunker import chunk_by_fixed_size, chunk_by_section, chunk_document
+from app.services.chunker import (
+    chunk_by_csv_rows,
+    chunk_by_fixed_size,
+    chunk_by_section,
+    chunk_document,
+)
 
 
 def test_fixed_size_chunker_produces_multiple_chunks():
@@ -60,3 +65,37 @@ def test_empty_sections_are_filtered():
     text = "## Section One\n\n## Section Two\nactual content"
     chunks = chunk_by_section(text, "glossary.md")
     assert all(c.text.strip() for c in chunks)
+
+
+def test_csv_row_chunker_produces_one_chunk_per_row():
+    prose = "Account A details.\n\nAccount B details.\n\nAccount C details."
+    chunks = chunk_by_csv_rows(prose, "accounts.csv")
+    assert len(chunks) == 3
+
+
+def test_csv_row_chunker_each_chunk_is_one_row():
+    prose = "Row one content.\n\nRow two content."
+    chunks = chunk_by_csv_rows(prose, "accounts.csv")
+    assert chunks[0].text == "Row one content."
+    assert chunks[1].text == "Row two content."
+
+
+def test_csv_row_chunker_sets_source_and_index():
+    prose = "Row A.\n\nRow B."
+    chunks = chunk_by_csv_rows(prose, "accounts.csv")
+    assert chunks[0].source == "accounts.csv"
+    assert chunks[0].chunk_index == 0
+    assert chunks[1].chunk_index == 1
+
+
+def test_csv_uses_row_chunking():
+    prose = "Account 1 info.\n\nAccount 2 info.\n\nAccount 3 info."
+    chunks = chunk_document(prose, Path("sample_accounts.csv"))
+    assert len(chunks) == 3
+    assert chunks[0].text == "Account 1 info."
+
+
+def test_csv_row_chunker_ignores_empty_paragraphs():
+    prose = "Row one.\n\n\n\nRow two."
+    chunks = chunk_by_csv_rows(prose, "accounts.csv")
+    assert len(chunks) == 2
