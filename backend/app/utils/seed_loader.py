@@ -13,12 +13,7 @@ settings = get_settings()
 
 
 def seed_reference_documents() -> None:
-    """
-    Ingest reference documents into ChromaDB on first startup.
-
-    Checks count before ingesting so container restarts don't
-    re-embed all documents and waste API credits.
-    """
+    # Skips if already populated — prevents re-embedding on container restart.
     if get_document_count() > 0:
         logger.info(
             "Vector store already seeded. Rebuilding BM25 index from existing corpus."

@@ -1,5 +1,6 @@
 'use client';
 
+import { THINKING_MODELS } from '@/lib/constants';
 import type { Model } from '@/types';
 
 interface Props {
@@ -15,6 +16,8 @@ export default function ControlBar({
   streamingEnabled,
   setStreamingEnabled,
 }: Props) {
+  const isThinkingModel = THINKING_MODELS.has(model);
+
   return (
     <div className="flex items-center gap-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 px-4 py-2">
       <div className="flex items-center gap-2">
@@ -31,23 +34,32 @@ export default function ControlBar({
       </div>
 
       <div className="flex items-center gap-2">
-        <label className="text-xs font-medium text-gray-500 dark:text-gray-400">Streaming</label>
+        <label className={`text-xs font-medium ${isThinkingModel ? 'text-gray-300 dark:text-gray-600' : 'text-gray-500 dark:text-gray-400'}`}>
+          Streaming
+        </label>
         <button
-          onClick={() => setStreamingEnabled(!streamingEnabled)}
+          onClick={() => !isThinkingModel && setStreamingEnabled(!streamingEnabled)}
+          disabled={isThinkingModel}
           className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-            streamingEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+            isThinkingModel
+              ? 'bg-gray-200 dark:bg-gray-700 cursor-not-allowed opacity-50'
+              : streamingEnabled
+                ? 'bg-blue-600'
+                : 'bg-gray-300 dark:bg-gray-600'
           }`}
           role="switch"
-          aria-checked={streamingEnabled}
+          aria-checked={isThinkingModel ? false : streamingEnabled}
+          aria-disabled={isThinkingModel}
+          title={isThinkingModel ? 'Streaming is not available for thinking models' : undefined}
         >
           <span
             className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${
-              streamingEnabled ? 'translate-x-4' : 'translate-x-1'
+              !isThinkingModel && streamingEnabled ? 'translate-x-4' : 'translate-x-1'
             }`}
           />
         </button>
-        <span className="text-xs text-gray-500 dark:text-gray-400">
-          {streamingEnabled ? 'On' : 'Off'}
+        <span className={`text-xs ${isThinkingModel ? 'text-gray-300 dark:text-gray-600' : 'text-gray-500 dark:text-gray-400'}`}>
+          {isThinkingModel ? 'N/A' : streamingEnabled ? 'On' : 'Off'}
         </span>
       </div>
     </div>

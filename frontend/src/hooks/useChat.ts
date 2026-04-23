@@ -1,9 +1,10 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 import { sendChatMessage, streamChatMessage } from '@/lib/api';
+import { THINKING_MODELS } from '@/lib/constants';
 import type { Message, Model } from '@/types';
 
 export function useChat() {
@@ -11,6 +12,17 @@ export function useChat() {
   const [isLoading, setIsLoading] = useState(false);
   const [model, setModel] = useState<Model>('gpt-4o-mini');
   const [streamingEnabled, setStreamingEnabled] = useState(true);
+  const abortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    if (THINKING_MODELS.has(model)) {
+      setStreamingEnabled(false);
+    }
+  }, [model]);
+
+  useEffect(() => {
+    return () => { abortRef.current?.abort(); };
+  }, []);
 
   const addMessage = useCallback(
     (role: Message['role'], content: string, sources?: string[]) => {
@@ -30,6 +42,10 @@ export function useChat() {
 
       try {
         if (streamingEnabled) {
+          abortRef.current?.abort();
+          const controller = new AbortController();
+          abortRef.current = controller;
+
           const assistantId = uuidv4();
           setMessages((prev) => [
             ...prev,
@@ -55,13 +71,15 @@ export function useChat() {
               );
               setIsLoading(false);
             },
+            controller.signal,
           );
         } else {
           const response = await sendChatMessage({ query, model, stream: false });
           addMessage('assistant', response.answer, response.sources);
           setIsLoading(false);
         }
-      } catch {
+      } catch (err) {
+        if (err instanceof Error && err.name === 'AbortError') return;
         addMessage('assistant', 'Something went wrong. Please try again.');
         setIsLoading(false);
       }

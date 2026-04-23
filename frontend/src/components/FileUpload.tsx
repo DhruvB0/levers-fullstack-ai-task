@@ -3,10 +3,15 @@
 import { useRef, useState } from 'react';
 
 import { uploadDocument } from '@/lib/api';
+import { ACCEPTED_FILE_TYPES } from '@/lib/constants';
 
 type UploadState = 'idle' | 'uploading' | 'success' | 'error';
 
-export default function FileUpload() {
+interface Props {
+  onUploadSuccess?: () => void;
+}
+
+export default function FileUpload({ onUploadSuccess }: Props) {
   const [state, setState] = useState<UploadState>('idle');
   const [message, setMessage] = useState('');
   const [isDragging, setIsDragging] = useState(false);
@@ -18,7 +23,12 @@ export default function FileUpload() {
     try {
       const result = await uploadDocument(file);
       setState('success');
-      setMessage(`✓ ${result.filename} — ${result.chunks_created} chunks ingested`);
+      if (result.chunks_created === 0) {
+        setMessage(`ℹ ${result.filename} — ${result.message}`);
+      } else {
+        setMessage(`✓ ${result.filename} — ${result.chunks_created} chunks ingested`);
+        onUploadSuccess?.();
+      }
     } catch (err) {
       setState('error');
       setMessage(err instanceof Error ? err.message : 'Upload failed');
@@ -55,7 +65,7 @@ export default function FileUpload() {
         <input
           ref={inputRef}
           type="file"
-          accept=".md,.csv"
+          accept={ACCEPTED_FILE_TYPES}
           className="hidden"
           onChange={(e) => {
             const file = e.target.files?.[0];
@@ -74,7 +84,9 @@ export default function FileUpload() {
           className={`mt-1.5 text-xs ${
             state === 'error'
               ? 'text-red-600 dark:text-red-400'
-              : 'text-green-600 dark:text-green-400'
+              : state === 'success' && message.startsWith('ℹ')
+                ? 'text-amber-600 dark:text-amber-400'
+                : 'text-green-600 dark:text-green-400'
           }`}
         >
           {message}

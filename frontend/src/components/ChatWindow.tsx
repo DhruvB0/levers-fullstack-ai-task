@@ -1,8 +1,11 @@
 'use client';
 
+import { useState } from 'react';
+
 import { useChat } from '@/hooks/useChat';
 import ChatInput from './ChatInput';
 import ControlBar from './ControlBar';
+import DocumentList from './DocumentList';
 import FileUpload from './FileUpload';
 import MessageList from './MessageList';
 import StatusBadge from './StatusBadge';
@@ -18,6 +21,7 @@ export default function ChatWindow() {
     setStreamingEnabled,
     sendMessage,
   } = useChat();
+  const [docsVersion, setDocsVersion] = useState(0);
 
   return (
     <div className="flex h-screen flex-col bg-white dark:bg-gray-950">
@@ -48,8 +52,11 @@ export default function ChatWindow() {
       {/* Message thread */}
       <MessageList messages={messages} isLoading={isLoading} />
 
+      {/* Ingested documents */}
+      <DocumentList refreshTrigger={docsVersion} />
+
       {/* Document upload */}
-      <FileUpload />
+      <FileUpload onUploadSuccess={() => setDocsVersion((v) => v + 1)} />
 
       {/* Chat input */}
       <ChatInput onSend={sendMessage} isLoading={isLoading} />

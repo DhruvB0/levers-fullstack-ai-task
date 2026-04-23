@@ -11,11 +11,7 @@ router = APIRouter()
 
 @router.post("/chat", response_model=None)
 async def chat(request: ChatRequest) -> ChatResponse | StreamingResponse:
-    """
-    Main chat endpoint.
-
-    If stream=True returns an SSE stream; otherwise returns full JSON.
-    """
+    """If stream=True returns an SSE stream; otherwise returns full JSON."""
     if request.stream:
 
         def event_stream():

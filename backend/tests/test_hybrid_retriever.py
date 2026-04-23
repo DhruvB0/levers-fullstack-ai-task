@@ -66,6 +66,18 @@ def test_bm25_build_and_query():
     assert results[0]["source"] == "a.md"
 
 
+def test_bm25_hyphenated_id_matches_despite_punctuation_in_query():
+    # "ACC-007" in corpus and "ACC-007?" in query must both tokenize to
+    # ["acc", "007"] so BM25 finds the account by ID.
+    corpus = [
+        {"text": "Account ACC-007 belongs to Susan Taylor.", "source": "accounts.csv"},
+        {"text": "Account ACC-001 belongs to Maria Gonzalez.", "source": "accounts.csv"},
+    ]
+    build_index(corpus)
+    results = query_bm25("What is the status of account ACC-007?", top_k=1)
+    assert results[0]["text"].startswith("Account ACC-007")
+
+
 def test_bm25_empty_corpus_returns_empty():
     build_index([])
     assert query_bm25("anything", top_k=5) == []

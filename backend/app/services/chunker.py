@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from pathlib import Path
 
+from app.core.constants import SECTION_CHUNKED_FILENAMES
+
 
 @dataclass
 class Chunk:
@@ -89,7 +91,7 @@ def chunk_document(text: str, file_path: Path) -> list[Chunk]:
     """
     source = file_path.name
 
-    if file_path.name == "glossary.md":
+    if file_path.name in SECTION_CHUNKED_FILENAMES:
         return chunk_by_section(text, source)
 
     if file_path.suffix == ".csv":

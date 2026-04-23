@@ -27,3 +27,8 @@ export interface IngestResponse {
   chunks_created: number;
   message: string;
 }
+
+export interface DocumentInfo {
+  filename: string;
+  chunk_count: number;
+}

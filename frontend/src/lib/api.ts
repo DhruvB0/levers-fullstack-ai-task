@@ -1,4 +1,4 @@
-import type { ChatRequest, ChatResponse, IngestResponse } from '@/types';
+import type { ChatRequest, ChatResponse, DocumentInfo, IngestResponse } from '@/types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
 
@@ -16,11 +16,13 @@ export async function streamChatMessage(
   request: ChatRequest,
   onToken: (token: string) => void,
   onDone: () => void,
+  signal?: AbortSignal,
 ): Promise<void> {
   const response = await fetch(`${API_URL}/api/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ ...request, stream: true }),
+    signal,
   });
 
   if (!response.ok) throw new Error(`Stream request failed: ${response.statusText}`);
@@ -30,29 +32,33 @@ export async function streamChatMessage(
   const decoder = new TextDecoder();
   let buffer = '';
 
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
 
-    buffer += decoder.decode(value, { stream: true });
-    const lines = buffer.split('\n');
-    buffer = lines.pop() ?? '';
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop() ?? '';
 
-    for (const line of lines) {
-      if (!line.startsWith('data: ')) continue;
-      const raw = line.slice('data: '.length).trim();
-      if (raw === '[DONE]') {
-        onDone();
-        return;
-      }
-      if (!raw) continue;
-      try {
-        const token = JSON.parse(raw) as string;
-        if (token) onToken(token);
-      } catch {
-        // malformed JSON chunk — skip
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const raw = line.slice('data: '.length).trim();
+        if (raw === '[DONE]') {
+          onDone();
+          return;
+        }
+        if (!raw) continue;
+        try {
+          const token = JSON.parse(raw) as string;
+          if (token) onToken(token);
+        } catch {
+          // malformed JSON chunk — skip
+        }
       }
     }
+  } finally {
+    reader.cancel();
   }
   onDone();
 }
@@ -66,6 +72,20 @@ export async function uploadDocument(file: File): Promise<IngestResponse> {
   });
   if (!response.ok) throw new Error(`Upload failed: ${response.statusText}`);
   return response.json();
+}
+
+export async function listDocuments(): Promise<DocumentInfo[]> {
+  const response = await fetch(`${API_URL}/api/documents`);
+  if (!response.ok) throw new Error('Failed to fetch documents');
+  return response.json();
+}
+
+export async function deleteDocument(filename: string): Promise<void> {
+  const response = await fetch(
+    `${API_URL}/api/documents/${encodeURIComponent(filename)}`,
+    { method: 'DELETE' },
+  );
+  if (!response.ok) throw new Error('Failed to delete document');
 }
 
 export async function checkHealth(): Promise<boolean> {

@@ -1,14 +1,10 @@
 from collections.abc import Generator
 
-from openai import OpenAI
-
 from app.core.config import get_settings
+from app.core.constants import THINKING_MODELS
+from app.services.openai_client import get_client
 
 settings = get_settings()
-client = OpenAI(api_key=settings.openai_api_key)
-
-# o1 models reject the 'system' role — prompt must be injected as first user message
-O1_MODELS = {"o1-mini", "o1-preview", "o1", "o3-mini"}
 
 
 def _build_messages(
@@ -19,7 +15,7 @@ def _build_messages(
 ) -> list[dict]:
     user_content = f"Context from documents:\n{context}\n\nQuestion: {query}"
 
-    if model in O1_MODELS:
+    if model in THINKING_MODELS:
         return [{"role": "user", "content": f"{system_prompt}\n\n{user_content}"}]
 
     return [
@@ -38,9 +34,9 @@ def get_completion(
     kwargs: dict = {"model": model, "messages": messages}
     # Reasoning models (o1/o3) consume tokens for internal chain-of-thought;
     # capping at 1000 leaves nothing for the actual response — let them self-limit.
-    if model not in O1_MODELS:
-        kwargs["max_completion_tokens"] = 1000
-    response = client.chat.completions.create(**kwargs)
+    if model not in THINKING_MODELS:
+        kwargs["max_completion_tokens"] = settings.max_completion_tokens
+    response = get_client().chat.completions.create(**kwargs)
     return response.choices[0].message.content or ""
 
 
@@ -56,15 +52,15 @@ def stream_completion(
     o1/o3 models don't support streaming — fall back to a single chunk
     so the caller doesn't need to handle the distinction.
     """
-    if model in O1_MODELS:
+    if model in THINKING_MODELS:
         yield get_completion(system_prompt, context, query, model)
         return
 
     messages = _build_messages(system_prompt, context, query, model)
-    stream = client.chat.completions.create(
+    stream = get_client().chat.completions.create(
         model=model,
         messages=messages,
-        max_completion_tokens=1000,
+        max_completion_tokens=settings.max_completion_tokens,
         stream=True,
     )
     for chunk in stream:
